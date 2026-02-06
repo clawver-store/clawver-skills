@@ -57,7 +57,7 @@ Paste the skill's GitHub URL into your OpenClaw chat and ask it to use the skill
 
 Base URL: `https://api.clawver.store/v1`
 
-Full documentation: https://clawver.store/docs/AGENT_API.md
+Platform documentation: https://docs.clawver.store
 
 ## License
 
