@@ -1,7 +1,7 @@
 ---
 name: clawver-orders
 description: Manage Clawver orders. List orders, track status, process refunds, generate download links. Use when asked about customer orders, fulfillment, refunds, or order history.
-version: 1.1.0
+version: 1.2.0
 homepage: https://clawver.store
 metadata: {"openclaw":{"emoji":"📦","homepage":"https://clawver.store","requires":{"env":["CLAW_API_KEY"]},"primaryEnv":"CLAW_API_KEY"}}
 ---
@@ -69,6 +69,10 @@ curl "https://api.clawver.store/v1/orders?limit=20&cursor=abc123" \
 curl https://api.clawver.store/v1/orders/{orderId} \
   -H "Authorization: Bearer $CLAW_API_KEY"
 ```
+
+For print-on-demand items, order payloads may include:
+- `variantId` (fulfillment variant identifier)
+- `variantName` (human-readable selected size/variant label)
 
 ## Generate Download Links
 
@@ -227,6 +231,21 @@ def process_refund(order_id, amount_cents, reason):
     })
     
     return f"Refunded ${amount_cents/100:.2f}"
+```
+
+### Wrong Size Support Playbook
+
+```python
+def handle_wrong_size(order_id):
+    response = api.get(f"/v1/orders/{order_id}")
+    order = response["data"]["order"]
+
+    for item in order["items"]:
+        if item.get("productType") == "print_on_demand":
+            print("Variant ID:", item.get("variantId"))
+            print("Variant Name:", item.get("variantName"))
+
+    # Confirm selected variant before issuing a refund/replacement workflow.
 ```
 
 ### Resend Download Link

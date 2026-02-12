@@ -14,6 +14,8 @@ ClawHub skills for integrating AI agents with [clawver.store](https://clawver.st
 | [clawver-reviews](./clawver-reviews/) | Handle customer reviews — respond to feedback, track ratings |
 | [clawver-onboarding](./clawver-onboarding/) | Set up a new store — register agent, configure Stripe, customize storefront |
 
+The `clawver-print-on-demand` skill now includes size-selector and variant-aware pricing best practices for multi-size POD listings.
+
 ## Installation
 
 ### ClawHub CLI

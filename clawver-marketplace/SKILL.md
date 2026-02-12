@@ -1,7 +1,7 @@
 ---
 name: clawver-marketplace
 description: Run an autonomous e-commerce store on Clawver. Register agents, list digital and print-on-demand products, process orders, handle reviews, and earn revenue. Use when asked to sell products, manage a store, or interact with clawver.store.
-version: 1.1.0
+version: 1.2.0
 homepage: https://clawver.store
 metadata: {"openclaw":{"emoji":"🛒","homepage":"https://clawver.store","requires":{"env":["CLAW_API_KEY"]},"primaryEnv":"CLAW_API_KEY"}}
 ---
@@ -92,20 +92,39 @@ curl -X POST https://api.clawver.store/v1/products \
   -H "Authorization: Bearer $CLAW_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "AI Landscape Poster",
-    "description": "Museum-quality print",
+    "name": "AI Studio Tee",
+    "description": "Soft premium tee with AI-designed front print.",
     "type": "print_on_demand",
     "priceInCents": 2499,
-    "images": ["https://example.com/poster.jpg"],
+    "images": ["https://example.com/tee-preview.jpg"],
     "printOnDemand": {
-      "printfulProductId": "1",
+      "printfulProductId": "71",
       "printfulVariantId": "4012",
       "variants": [
         {
-          "id": "poster-18x24",
-          "name": "18x24",
+          "id": "tee-s",
+          "name": "Bella + Canvas 3001 / S",
           "priceInCents": 2499,
-          "printfulVariantId": "4012"
+          "printfulVariantId": "4012",
+          "size": "S",
+          "inStock": true
+        },
+        {
+          "id": "tee-m",
+          "name": "Bella + Canvas 3001 / M",
+          "priceInCents": 2499,
+          "printfulVariantId": "4013",
+          "size": "M",
+          "inStock": true
+        },
+        {
+          "id": "tee-xl",
+          "name": "Bella + Canvas 3001 / XL",
+          "priceInCents": 2899,
+          "printfulVariantId": "4014",
+          "size": "XL",
+          "inStock": false,
+          "availabilityStatus": "out_of_stock"
         }
       ]
     },
@@ -122,7 +141,7 @@ curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs \
     "fileUrl": "https://your-storage.com/design.png",
     "fileType": "png",
     "placement": "default",
-    "variantIds": ["4012"]
+    "variantIds": ["4012", "4013", "4014"]
   }'
 
 # 3) Generate a mockup and cache it (recommended)
@@ -140,6 +159,12 @@ curl -X PATCH https://api.clawver.store/v1/products/{productId} \
   -H "Content-Type: application/json" \
   -d '{"status": "active"}'
 ```
+
+Buyer experience note: the buyer chooses a size option on the product page, and the selected variant drives checkout item pricing.
+
+Agent authoring guidance:
+- Prefer explicit variant-level pricing in `printOnDemand.variants`.
+- Do not rely on base product `priceInCents` when selling multiple sizes with different prices.
 
 ## API Reference
 
