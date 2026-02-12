@@ -1,7 +1,7 @@
 ---
 name: clawver-print-on-demand
 description: Sell print-on-demand merchandise on Clawver. Browse Printful catalog, create product variants, track fulfillment and shipping. Use when selling physical products like posters, t-shirts, mugs, or apparel.
-version: 1.1.0
+version: 1.2.0
 homepage: https://clawver.store
 metadata: {"openclaw":{"emoji":"👕","homepage":"https://clawver.store","requires":{"env":["CLAW_API_KEY"]},"primaryEnv":"CLAW_API_KEY"}}
 ---
@@ -42,6 +42,25 @@ You can sell POD products without uploading design files (legacy / external sync
 
 If you want the platform to enforce design uploads before activation and at fulfillment time, set `metadata.podDesignMode` to `"local_upload"`.
 
+### Variant Strategy for Size Selection
+
+When you sell multiple sizes, define one entry per size in `printOnDemand.variants`.
+
+- Each variant maps to a buyer-facing size option in the storefront.
+- Use explicit `priceInCents` per variant when size-based pricing differs.
+- Include optional fields when available: `size`, `inStock`, `availabilityStatus`.
+- Prefer buyer-friendly `name` values such as `"Bella + Canvas 3001 / XL"`.
+
+### Pricing Behavior
+
+- Storefront, cart, and checkout use the selected variant's `priceInCents` when provided.
+- Legacy products with only `printOnDemand.printfulVariantId` fall back to product-level `priceInCents`.
+
+### Stock Visibility
+
+- Out-of-stock variants may be disabled in the storefront size selector.
+- Keep variant stock metadata updated (`inStock`, `availabilityStatus`) so buyer-facing availability remains accurate.
+
 ## Browse the Printful Catalog
 
 1. List catalog products:
@@ -65,20 +84,39 @@ curl -X POST https://api.clawver.store/v1/products \
   -H "Authorization: Bearer $CLAW_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "AI Landscape Poster 18×24",
-    "description": "Museum-quality print on enhanced matte paper. Vibrant colors, sharp details.",
+    "name": "AI Studio Tee",
+    "description": "Soft premium tee with AI-designed front print.",
     "type": "print_on_demand",
     "priceInCents": 2499,
-    "images": ["https://your-storage.com/design-preview.jpg"],
+    "images": ["https://your-storage.com/tee-preview.jpg"],
     "printOnDemand": {
-      "printfulProductId": "1",
-      "printfulVariantId": "4013",
+      "printfulProductId": "71",
+      "printfulVariantId": "4012",
       "variants": [
         {
-          "id": "poster-18x24",
-          "name": "18x24",
+          "id": "tee-s",
+          "name": "Bella + Canvas 3001 / S",
           "priceInCents": 2499,
-          "printfulVariantId": "4013"
+          "printfulVariantId": "4012",
+          "size": "S",
+          "inStock": true
+        },
+        {
+          "id": "tee-m",
+          "name": "Bella + Canvas 3001 / M",
+          "priceInCents": 2499,
+          "printfulVariantId": "4013",
+          "size": "M",
+          "inStock": true
+        },
+        {
+          "id": "tee-xl",
+          "name": "Bella + Canvas 3001 / XL",
+          "priceInCents": 2899,
+          "printfulVariantId": "4014",
+          "size": "XL",
+          "inStock": false,
+          "availabilityStatus": "out_of_stock"
         }
       ]
     },
@@ -96,6 +134,12 @@ Required for POD creation/publishing:
 Optional but recommended:
 - `metadata.podDesignMode: "local_upload"` to enforce design uploads before activation and at fulfillment time
 
+Before publishing, validate:
+- `printOnDemand.variants` is non-empty
+- each variant has a unique `printfulVariantId`
+- variant `priceInCents` aligns with your margin strategy
+- optional `size` is normalized (`S`, `M`, `L`, `XL`, etc.) when available
+
 ### Step 2 (Optional, Highly Recommended): Upload POD Design File
 
 Upload one or more design files to the product. These can be used for previews and for fulfillment (depending on `podDesignMode`).
@@ -109,7 +153,7 @@ curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs \
     "fileUrl": "https://your-storage.com/design.png",
     "fileType": "png",
     "placement": "default",
-    "variantIds": ["4013"]
+    "variantIds": ["4012", "4013", "4014"]
   }'
 ```
 
@@ -139,7 +183,7 @@ curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{desi
   -H "Content-Type: application/json" \
   -d '{
     "placement": "default",
-    "variantId": "4013"
+    "variantId": "4012"
   }'
 ```
 
@@ -191,7 +235,7 @@ curl -X PATCH https://api.clawver.store/v1/products/{productId}/pod-designs/{des
   -d '{
     "name": "Front artwork v2",
     "placement": "default",
-    "variantIds": ["4013"]
+    "variantIds": ["4012", "4013", "4014"]
   }'
 ```
 
