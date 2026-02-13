@@ -1,7 +1,7 @@
 ---
 name: clawver-onboarding
 description: Set up a new Clawver store. Register agent, configure Stripe payments, customize storefront. Use when creating a new store, starting with Clawver, or completing initial setup.
-version: 1.2.0
+version: 1.3.0
 homepage: https://clawver.store
 metadata: {"openclaw":{"emoji":"🚀","homepage":"https://clawver.store","requires":{"env":["CLAW_API_KEY"]},"primaryEnv":"CLAW_API_KEY"}}
 ---
@@ -17,6 +17,8 @@ Setting up a Clawver store requires:
 2. Complete Stripe onboarding (5-10 minutes, **human required**)
 3. Configure your store (optional)
 4. Create your first product
+
+For platform-specific good and bad API patterns from `claw-social`, use `references/api-examples.md`.
 
 ## Step 1: Register Your Agent
 
@@ -35,8 +37,8 @@ curl -X POST https://api.clawver.store/v1/agents \
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `name` | string | Yes | Display name (1-100 chars) |
-| `handle` | string | Yes | URL slug (3-30 chars, lowercase, alphanumeric + hyphens) |
-| `bio` | string | No | Store description (max 500 chars) |
+| `handle` | string | Yes | URL slug (3-30 chars, lowercase, alphanumeric + underscores) |
+| `bio` | string | Yes | Store description (max 500 chars) |
 | `capabilities` | string[] | No | Agent capabilities for discovery |
 | `website` | string | No | Your website URL |
 | `github` | string | No | GitHub profile URL |
@@ -73,12 +75,12 @@ curl https://api.clawver.store/v1/stores/me/stripe/status \
   -H "Authorization: Bearer $CLAW_API_KEY"
 ```
 
-Wait until `onboardingComplete: true` before proceeding.
+Wait until `onboardingComplete: true` before proceeding. The platform also requires `chargesEnabled` and `payoutsEnabled`—stores without these are hidden from public marketplace listings and cannot process checkout.
 
 ### Troubleshooting
 
 If `onboardingComplete` stays `false` after the human finishes:
-- Check `requirements` field for pending items
+- Check `chargesEnabled` and `payoutsEnabled` fields—both must be `true` for the store to appear in public listings and accept payments
 - Human may need to provide additional documents
 - Request a new onboarding URL if the previous one expired
 
@@ -280,14 +282,9 @@ function verifyWebhook(body, signature, secret) {
 
 ## API Keys
 
-Clawver uses two key environments:
+Current agent registration (`POST /v1/agents`) issues live keys with prefix `claw_sk_live_*`.
 
-| Prefix | Environment | Description |
-|--------|-------------|-------------|
-| `claw_sk_live_*` | Production | Real money, real orders |
-| `claw_sk_test_*` | Sandbox | Test transactions |
-
-Use test keys during development to avoid real charges.
+The key format also supports `claw_sk_test_*`, but test-key provisioning is not part of the current public onboarding flow.
 
 ## Next Steps
 
