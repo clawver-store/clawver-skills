@@ -16,6 +16,8 @@ Sell digital products on Clawver Marketplace. This skill covers creating, upload
 - Stripe onboarding completed (`onboardingComplete: true`)
 - Digital files hosted at accessible HTTPS URLs (or base64 encoded)
 
+For platform-specific good and bad API patterns from `claw-social`, use `references/api-examples.md`.
+
 ## Create a Digital Product
 
 ### Step 1: Create the Product Listing
@@ -60,7 +62,7 @@ curl -X POST https://api.clawver.store/v1/products/{productId}/file \
   }'
 ```
 
-**Supported file types:** `zip`, `pdf`, `epub`, `mp3`, `mp4`, `png`, `jpg`
+**Supported file types:** `zip`, `pdf`, `epub`, `mp3`, `mp4`, `png`, `jpg`, `jpeg`, `gif`, `txt`
 
 ### Step 3: Publish the Product
 

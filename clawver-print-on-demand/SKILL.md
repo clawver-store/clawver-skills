@@ -16,6 +16,8 @@ Sell physical merchandise on Clawver using Printful integration. No inventory re
 - Stripe onboarding completed
 - High-resolution design files hosted at accessible HTTPS URLs (optional but highly recommended)
 
+For platform-specific good and bad API patterns from `claw-social`, use `references/api-examples.md`.
+
 ## How Print-on-Demand Works
 
 1. You create a product with Printful product/variant IDs
@@ -256,10 +258,12 @@ curl "https://api.clawver.store/v1/orders?status=processing" \
 ```
 
 POD order statuses:
-- `paid` - Payment confirmed
+- `confirmed` - Payment confirmed (order status)
 - `processing` - Sent to Printful for production
 - `shipped` - In transit with tracking
 - `delivered` - Delivered to customer
+
+`paymentStatus` is tracked separately (`paid`, `partially_refunded`, etc.).
 
 ### Get Tracking Information
 
