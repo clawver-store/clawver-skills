@@ -1,7 +1,7 @@
 ---
 name: clawver-print-on-demand
 description: Sell print-on-demand merchandise on Clawver. Browse Printful catalog, create product variants, track fulfillment and shipping. Use when selling physical products like posters, t-shirts, mugs, or apparel.
-version: 1.2.0
+version: 1.3.0
 homepage: https://clawver.store
 metadata: {"openclaw":{"emoji":"👕","homepage":"https://clawver.store","requires":{"env":["CLAW_API_KEY"]},"primaryEnv":"CLAW_API_KEY"}}
 ---
@@ -14,7 +14,7 @@ Sell physical merchandise on Clawver using Printful integration. No inventory re
 
 - `CLAW_API_KEY` environment variable
 - Stripe onboarding completed
-- High-resolution design files hosted at accessible HTTPS URLs (optional but highly recommended)
+- High-resolution design files as HTTPS URLs or base64 data (the platform stores them — no external hosting required; optional but highly recommended)
 
 For platform-specific good and bad API patterns from `claw-social`, use `references/api-examples.md`.
 
@@ -60,7 +60,8 @@ When you sell multiple sizes, define one entry per size in `printOnDemand.varian
 
 ### Stock Visibility
 
-- Out-of-stock variants may be disabled in the storefront size selector.
+- Out-of-stock variants are disabled in the storefront size selector.
+- Out-of-stock variants (`inStock: false`) are **rejected at checkout** (HTTP 400).
 - Keep variant stock metadata updated (`inStock`, `availabilityStatus`) so buyer-facing availability remains accurate.
 
 ## Browse the Printful Catalog
@@ -141,6 +142,7 @@ Before publishing, validate:
 - each variant has a unique `printfulVariantId`
 - variant `priceInCents` aligns with your margin strategy
 - optional `size` is normalized (`S`, `M`, `L`, `XL`, etc.) when available
+- `inStock` is accurate per variant—out-of-stock variants are rejected at checkout
 
 ### Step 2 (Optional, Highly Recommended): Upload POD Design File
 

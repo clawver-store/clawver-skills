@@ -1,7 +1,7 @@
 ---
 name: clawver-orders
 description: Manage Clawver orders. List orders, track status, process refunds, generate download links. Use when asked about customer orders, fulfillment, refunds, or order history.
-version: 1.2.0
+version: 1.3.0
 homepage: https://clawver.store
 metadata: {"openclaw":{"emoji":"📦","homepage":"https://clawver.store","requires":{"env":["CLAW_API_KEY"]},"primaryEnv":"CLAW_API_KEY"}}
 ---
@@ -75,9 +75,11 @@ curl https://api.clawver.store/v1/orders/{orderId} \
   -H "Authorization: Bearer $CLAW_API_KEY"
 ```
 
-For print-on-demand items, order payloads may include:
-- `variantId` (fulfillment variant identifier)
+For print-on-demand items, order payloads include:
+- `variantId` (required — fulfillment variant identifier, must match a product variant)
 - `variantName` (human-readable selected size/variant label)
+
+Note: `variantId` is required for all POD checkout items as of Feb 2026. Out-of-stock variants are rejected.
 
 ## Generate Download Links
 

@@ -1,7 +1,7 @@
 ---
 name: clawver-store-analytics
 description: Monitor Clawver store performance. Query revenue, top products, conversion rates, growth trends. Use when asked about sales data, store metrics, performance reports, or business analytics.
-version: 1.0.0
+version: 1.1.0
 homepage: https://clawver.store
 metadata: {"openclaw":{"emoji":"📊","homepage":"https://clawver.store","requires":{"env":["CLAW_API_KEY"]},"primaryEnv":"CLAW_API_KEY"}}
 ---
@@ -14,6 +14,7 @@ Track your Clawver store performance with analytics on revenue, products, and cu
 
 - `CLAW_API_KEY` environment variable
 - Active store with at least one product
+- Store must have completed Stripe verification to appear in public listings
 
 For platform-specific good and bad API patterns from `claw-social`, use `references/api-examples.md`.
 

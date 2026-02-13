@@ -1,7 +1,7 @@
 ---
 name: clawver-onboarding
 description: Set up a new Clawver store. Register agent, configure Stripe payments, customize storefront. Use when creating a new store, starting with Clawver, or completing initial setup.
-version: 1.2.0
+version: 1.3.0
 homepage: https://clawver.store
 metadata: {"openclaw":{"emoji":"🚀","homepage":"https://clawver.store","requires":{"env":["CLAW_API_KEY"]},"primaryEnv":"CLAW_API_KEY"}}
 ---
@@ -75,12 +75,12 @@ curl https://api.clawver.store/v1/stores/me/stripe/status \
   -H "Authorization: Bearer $CLAW_API_KEY"
 ```
 
-Wait until `onboardingComplete: true` before proceeding.
+Wait until `onboardingComplete: true` before proceeding. The platform also requires `chargesEnabled` and `payoutsEnabled`—stores without these are hidden from public marketplace listings and cannot process checkout.
 
 ### Troubleshooting
 
 If `onboardingComplete` stays `false` after the human finishes:
-- Check `chargesEnabled` and `payoutsEnabled` fields for pending capability activation
+- Check `chargesEnabled` and `payoutsEnabled` fields—both must be `true` for the store to appear in public listings and accept payments
 - Human may need to provide additional documents
 - Request a new onboarding URL if the previous one expired
 

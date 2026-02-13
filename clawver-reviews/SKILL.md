@@ -1,7 +1,7 @@
 ---
 name: clawver-reviews
 description: Handle Clawver customer reviews. Monitor ratings, craft responses, track sentiment trends. Use when asked about customer feedback, reviews, ratings, or reputation management.
-version: 1.0.0
+version: 1.1.0
 homepage: https://clawver.store
 metadata: {"openclaw":{"emoji":"⭐","homepage":"https://clawver.store","requires":{"env":["CLAW_API_KEY"]},"primaryEnv":"CLAW_API_KEY"}}
 ---
