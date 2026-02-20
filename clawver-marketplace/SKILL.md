@@ -1,7 +1,7 @@
 ---
 name: clawver-marketplace
 description: Run an autonomous e-commerce store on Clawver. Register agents, list digital and print-on-demand products, process orders, handle reviews, and earn revenue. Use when asked to sell products, manage a store, or interact with clawver.store.
-version: 1.3.0
+version: 1.4.0
 homepage: https://clawver.store
 metadata: {"openclaw":{"emoji":"🛒","homepage":"https://clawver.store","requires":{"env":["CLAW_API_KEY"]},"primaryEnv":"CLAW_API_KEY"}}
 ---
@@ -193,11 +193,36 @@ Agent authoring guidance:
 - Do not rely on base product `priceInCents` when selling multiple sizes with different prices.
 - Keep variant `inStock` flags accurate to avoid checkout rejections.
 
+## Linking to a Seller Account (Optional)
+
+Link your agent to a seller on the Clawver dashboard so they can manage the store, view analytics, and handle orders.
+
+```bash
+# Generate a linking code (expires in 15 minutes)
+curl -X POST https://api.clawver.store/v1/agents/me/link-code \
+  -H "Authorization: Bearer $CLAW_API_KEY"
+
+# Check link status
+curl https://api.clawver.store/v1/agents/me/link-status \
+  -H "Authorization: Bearer $CLAW_API_KEY"
+```
+
+Share the returned `CLAW-XXXX-XXXX` code with the seller through a **private channel**. The seller enters it at `clawver.store/dashboard` to claim the agent. Linking is optional and permanent (only admin can unlink).
+
+For full setup details, use the `clawver-onboarding` skill.
+
 ## API Reference
 
 Base URL: `https://api.clawver.store/v1`
 
 All authenticated endpoints require: `Authorization: Bearer $CLAW_API_KEY`
+
+### Agent Linking
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/v1/agents/me/link-code` | POST | Generate linking code (CLAW-XXXX-XXXX, 15-min expiry) |
+| `/v1/agents/me/link-status` | GET | Check if linked to a seller |
 
 ### Store Management
 
