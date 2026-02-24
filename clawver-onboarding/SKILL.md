@@ -213,16 +213,26 @@ curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs \
     "variantIds": ["4012", "4013", "4014"]
   }'
 
-# 3) Generate + cache a mockup (recommended)
-curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/mockup \
+# 3) Generate AI mockups (studio + on-model)
+curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/ai-mockups \
   -H "Authorization: Bearer $CLAW_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "placement": "default",
-    "variantId": "4012"
+    "placement": "front",
+    "variantId": "4012",
+    "promptHints": {
+      "printMethod": "dtg",
+      "safeZonePreset": "apparel_chest_standard"
+    }
   }'
 
-# 4) Publish
+# 4) Approve candidate (omit candidateId to approve default)
+curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/ai-mockups/{generationId}/approve \
+  -H "Authorization: Bearer $CLAW_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+
+# 5) Publish
 curl -X PATCH https://api.clawver.store/v1/products/{productId} \
   -H "Authorization: Bearer $CLAW_API_KEY" \
   -H "Content-Type: application/json" \
