@@ -181,35 +181,39 @@ curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs \
 
 Use the seeded AI flow so another agent can execute with consistent grounding:
 1) preflight to resolve compatible inputs,
-2) call `ai-mockups` (which first generates a real Printful seed mockup),
-3) poll generation status,
-4) approve a candidate for storefront use.
+2) read `data.recommendedRequest` and reuse those exact values,
+3) call `ai-mockups` (which first generates a real Printful seed mockup),
+4) poll generation status,
+5) approve a candidate for storefront use.
 
 ```bash
-# 3a) Preflight
-curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/mockup/preflight \
+# 3a) Preflight and extract recommendedRequest
+PREFLIGHT=$(curl -sS -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/mockup/preflight \
   -H "Authorization: Bearer $CLAW_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "variantId": "4012",
-    "placement": "front",
-    "technique": "dtg"
-  }'
+    "placement": "front"
+  }')
+echo "$PREFLIGHT" | jq '.data.recommendedRequest'
+REC_VARIANT_ID=$(echo "$PREFLIGHT" | jq -r '.data.recommendedRequest.variantId')
+REC_PLACEMENT=$(echo "$PREFLIGHT" | jq -r '.data.recommendedRequest.placement')
+REC_TECHNIQUE=$(echo "$PREFLIGHT" | jq -r '.data.recommendedRequest.technique // empty')
 
 # 3b) Generate seeded AI mockups
 # Internal order of operations: Printful seed first, then GenAI candidates.
 curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/ai-mockups \
   -H "Authorization: Bearer $CLAW_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{
-    "variantId": "4012",
-    "placement": "front",
-    "idempotencyKey": "ai-mockup-1",
-    "promptHints": {
-      "printMethod": "dtg",
-      "safeZonePreset": "apparel_chest_standard"
+  -d "{
+    \"variantId\": \"$REC_VARIANT_ID\",
+    \"placement\": \"$REC_PLACEMENT\",
+    \"idempotencyKey\": \"ai-mockup-1\",
+    \"promptHints\": {
+      \"printMethod\": \"$REC_TECHNIQUE\",
+      \"safeZonePreset\": \"apparel_chest_standard\"
     }
-  }'
+  }"
 
 # 3c) Poll generation status
 curl https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/ai-mockups/{generationId} \
@@ -226,6 +230,9 @@ If you need a non-AI deterministic path, use the direct Printful task endpoints:
 - `POST /v1/products/{productId}/pod-designs/{designId}/mockup-tasks`
 - `GET /v1/products/{productId}/pod-designs/{designId}/mockup-tasks/{taskId}`
 - `POST /v1/products/{productId}/pod-designs/{designId}/mockup-tasks/{taskId}/store`
+
+When calling `mockup-tasks`, pass the same `REC_VARIANT_ID`, `REC_PLACEMENT`, and `REC_TECHNIQUE`.
+If task creation or polling returns `429`/`RATE_LIMITED`, retry with exponential backoff and jitter.
 
 ### Step 4: Publish
 
