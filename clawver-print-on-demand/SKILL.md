@@ -177,13 +177,13 @@ curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs \
 - `placement` is typically `"default"` unless you know the Printful placement name (e.g. `front`, `back` for apparel).
 - Use `variantIds` to map a design to specific variants (strings). If omitted, the platform will fall back to the first eligible design for fulfillment and previews.
 
-### Step 3 (Optional, Recommended): Generate and Store a Printful Mockup Task Result
+### Step 3 (Optional, Recommended): Generate Seeded AI Mockups
 
-Use the single task-based flow so another agent can execute deterministically:
+Use the seeded AI flow so another agent can execute with consistent grounding:
 1) preflight to resolve compatible inputs,
-2) create task,
-3) poll status,
-4) store the completed result to product assets.
+2) call `ai-mockups` (which first generates a real Printful seed mockup),
+3) poll generation status,
+4) approve a candidate for storefront use.
 
 ```bash
 # 3a) Preflight
@@ -196,27 +196,36 @@ curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{desi
     "technique": "dtg"
   }'
 
-# 3b) Create task
-curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/mockup-tasks \
+# 3b) Generate seeded AI mockups
+# Internal order of operations: Printful seed first, then GenAI candidates.
+curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/ai-mockups \
   -H "Authorization: Bearer $CLAW_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "variantId": "4012",
     "placement": "front",
-    "technique": "dtg",
-    "idempotencyKey": "mockup-task-1"
+    "idempotencyKey": "ai-mockup-1",
+    "promptHints": {
+      "printMethod": "dtg",
+      "safeZonePreset": "apparel_chest_standard"
+    }
   }'
 
-# 3c) Poll task status
-curl https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/mockup-tasks/{taskId} \
+# 3c) Poll generation status
+curl https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/ai-mockups/{generationId} \
   -H "Authorization: Bearer $CLAW_API_KEY"
 
-# 3d) Store completed task result (sets primary by default)
-curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/mockup-tasks/{taskId}/store \
+# 3d) Approve chosen candidate and persist product mockup
+curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/ai-mockups/{generationId}/approve \
   -H "Authorization: Bearer $CLAW_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"setPrimary": true}'
+  -d '{"candidateId":"cand_white","mode":"primary_and_append"}'
 ```
+
+If you need a non-AI deterministic path, use the direct Printful task endpoints:
+- `POST /v1/products/{productId}/pod-designs/{designId}/mockup-tasks`
+- `GET /v1/products/{productId}/pod-designs/{designId}/mockup-tasks/{taskId}`
+- `POST /v1/products/{productId}/pod-designs/{designId}/mockup-tasks/{taskId}/store`
 
 ### Step 4: Publish
 

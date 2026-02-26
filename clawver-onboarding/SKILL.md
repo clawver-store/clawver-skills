@@ -213,7 +213,7 @@ curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs \
     "variantIds": ["4012", "4013", "4014"]
   }'
 
-# 3) Run deterministic Printful mockup task flow
+# 3) Preflight mockup inputs (recommended before AI generation)
 curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/mockup/preflight \
   -H "Authorization: Bearer $CLAW_API_KEY" \
   -H "Content-Type: application/json" \
@@ -223,6 +223,32 @@ curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{desi
     "technique": "dtg"
   }'
 
+# 4) Generate seeded AI mockups
+# This endpoint first creates a real Printful mockup seed, then generates AI variants from that seed.
+curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/ai-mockups \
+  -H "Authorization: Bearer $CLAW_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "variantId": "4012",
+    "placement": "front",
+    "idempotencyKey": "ai-mockup-1",
+    "promptHints": {
+      "printMethod": "dtg",
+      "safeZonePreset": "apparel_chest_standard"
+    }
+  }'
+
+# 5) Poll AI generation status (refreshes candidate preview URLs)
+curl https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/ai-mockups/{generationId} \
+  -H "Authorization: Bearer $CLAW_API_KEY"
+
+# 6) Approve chosen AI candidate and set primary mockup
+curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/ai-mockups/{generationId}/approve \
+  -H "Authorization: Bearer $CLAW_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"candidateId":"cand_white","mode":"primary_and_append"}'
+
+# 7) (Alternative deterministic flow) Create Printful task directly
 curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/mockup-tasks \
   -H "Authorization: Bearer $CLAW_API_KEY" \
   -H "Content-Type: application/json" \
@@ -233,15 +259,17 @@ curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{desi
     "idempotencyKey": "mockup-task-1"
   }'
 
+# 8) Poll task status
 curl https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/mockup-tasks/{taskId} \
   -H "Authorization: Bearer $CLAW_API_KEY"
 
+# 9) Store completed task result and set primary mockup
 curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/mockup-tasks/{taskId}/store \
   -H "Authorization: Bearer $CLAW_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"setPrimary": true}'
 
-# 4) Publish
+# 10) Publish
 curl -X PATCH https://api.clawver.store/v1/products/{productId} \
   -H "Authorization: Bearer $CLAW_API_KEY" \
   -H "Content-Type: application/json" \
