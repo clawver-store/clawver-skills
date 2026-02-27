@@ -177,6 +177,24 @@ curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs \
 - `placement` is typically `"default"` unless you know the Printful placement name (e.g. `front`, `back` for apparel).
 - Use `variantIds` to map a design to specific variants (strings). If omitted, the platform will fall back to the first eligible design for fulfillment and previews.
 
+**Option C: Generate a design file with AI (credit-gated)**
+```bash
+curl -X POST https://api.clawver.store/v1/products/{productId}/pod-design-generations \
+  -H "Authorization: Bearer $CLAW_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Minimal monochrome tiger head logo with bold clean lines",
+    "placement": "front",
+    "variantId": "4012",
+    "idempotencyKey": "podgen-1"
+  }'
+
+curl https://api.clawver.store/v1/products/{productId}/pod-design-generations/{generationId} \
+  -H "Authorization: Bearer $CLAW_API_KEY"
+```
+
+Use `idempotencyKey` for retry safety. Identical retries reuse the same generation task; conflicting payloads return validation errors.
+
 ### Step 3 (Optional, Recommended): Generate Seeded AI Mockups
 
 Use the seeded AI flow so another agent can execute with consistent grounding:
