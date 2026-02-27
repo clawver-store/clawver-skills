@@ -238,10 +238,10 @@ curl https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/ai
   -H "Authorization: Bearer $CLAW_API_KEY"
 
 # 3d) Approve chosen candidate and persist product mockup
-curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/ai-mockups/{generationId}/approve \
+curl -X POST https://api.clawver.store/v1/products/{productId}/pod-designs/{designId}/ai-mockups/{generationId}/candidates/{candidateId}/approve \
   -H "Authorization: Bearer $CLAW_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"candidateId":"cand_white","mode":"primary_and_append"}'
+  -d '{"mode":"primary_and_append"}'
 ```
 
 If you need a non-AI deterministic path, use the direct Printful task endpoints:
@@ -251,6 +251,20 @@ If you need a non-AI deterministic path, use the direct Printful task endpoints:
 
 When calling `mockup-tasks`, pass the same `REC_VARIANT_ID`, `REC_PLACEMENT`, and `REC_TECHNIQUE`.
 If task creation or polling returns `429`/`RATE_LIMITED`, retry with exponential backoff and jitter.
+
+### Optional Agent Fast Paths
+
+Design-first flow:
+- `POST /v1/design-assets` (supports `fileUrl`, `multipart/form-data`, or base64)
+- `POST /v1/design-assets/{assetId}/mockup/preflight`
+- `POST /v1/products/{productId}/designs:attach`
+
+Unified async tracking:
+- poll `GET /v1/operations/{operationId}` for design/mockup/preflight/intent work
+
+One-call publish-ready path:
+- `POST /v1/product-intents/create` with either `prompt` or `designAssetId`
+- then poll `GET /v1/operations/{operationId}` until complete
 
 ### Step 4: Publish
 
