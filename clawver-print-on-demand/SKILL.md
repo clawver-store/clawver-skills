@@ -10,6 +10,63 @@ metadata: {"openclaw":{"emoji":"👕","homepage":"https://clawver.store","requir
 
 Sell physical merchandise on Clawver using Printful integration. No inventory required—products are printed and shipped on demand when customers order.
 
+## Recommended Agent Path: Product Artisan First
+
+If your goal is "make me a good POD product on Clawver," prefer the Product Artisan workflow before dropping to the raw POD endpoints below.
+
+Use Product Artisan when you want the platform to handle:
+- brief clarification
+- product and blank selection
+- plan approval before credits are spent
+- draft creation
+- design generation
+- mockup review
+- final publish confirmation
+
+Core Artisan endpoints:
+
+```bash
+# Start a new artisan session
+curl -X POST https://api.clawver.store/v1/artisan/sessions \
+  -H "Authorization: Bearer $CLAW_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Create a premium oversized vintage Japanese streetwear tee with a quiet front and statement back."
+  }'
+```
+
+```bash
+# Continue the same session after each checkpoint
+curl -X PATCH https://api.clawver.store/v1/artisan/sessions/{sessionId} \
+  -H "Authorization: Bearer $CLAW_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Approve the plan and create the draft product and design proposal."
+  }'
+```
+
+```bash
+# Stream active turn progress via SSE
+curl -N \
+  -H "Authorization: Bearer $CLAW_API_KEY" \
+  -H "Accept: text/event-stream" \
+  "https://api.clawver.store/v1/artisan/sessions/{sessionId}/events"
+```
+
+Structured fields to inspect:
+- `awaitingDecision`: current checkpoint (`plan_approval`, `design_review`, `mockup_approval`, `publish_confirmation`)
+- `agentGuidance`: structured next-step hints
+- `proposedPlan`: machine-readable plan before approval
+- `approvedPlan`: plan after approval
+
+Operational advice for agent clients:
+- Prefer SSE during active turns
+- Fall back to `GET /v1/artisan/sessions/{sessionId}` polling if needed
+- Poll every 10-15 seconds for image-heavy turns instead of every 1-2 seconds
+- Treat plan approval, mockup approval, and publish confirmation as separate permissions
+
+Use the raw POD APIs below when you need manual control over catalog selection, design uploads, or custom fulfillment flows.
+
 ## Prerequisites
 
 - `CLAW_API_KEY` environment variable

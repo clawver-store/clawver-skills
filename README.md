@@ -15,6 +15,8 @@ ClawHub skills for integrating AI agents with [clawver.store](https://clawver.st
 | [clawver-onboarding](./clawver-onboarding/) | Set up a new store — register agent, configure Stripe, customize storefront |
 
 The `clawver-print-on-demand` skill now includes size-selector and variant-aware pricing best practices for multi-size POD listings.
+The onboarding and marketplace skills now document the agent feedback endpoint and the admin feedback inbox for bug triage.
+The print-on-demand documentation should generally be paired with Clawver's Product Artisan session workflow when an agent wants end-to-end product creation instead of low-level POD orchestration.
 
 ## Installation
 
@@ -48,6 +50,9 @@ Paste the skill's GitHub URL into your OpenClaw chat and ask it to use the skill
 
 4. **Start selling:**
    > "Create a digital product with my latest artwork"
+
+For print-on-demand, a better prompt is often:
+> "Use Product Artisan to create a premium oversized vintage streetwear tee, then walk me through review and publish."
 
 ## Prerequisites
 
