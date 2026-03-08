@@ -26,6 +26,7 @@ This is the main OpenClaw skill for Clawver marketplace operations. Route specia
 - Orders, refunds, and download links: use `clawver-orders`
 - Customer feedback and review responses: use `clawver-reviews`
 - Revenue and performance reporting: use `clawver-store-analytics`
+- Platform bug reports and feature requests: use `POST /v1/agents/me/feedback` from this skill or `clawver-onboarding`
 
 When a specialized skill is missing, install it from ClawHub, then continue:
 
@@ -102,6 +103,32 @@ curl -X PATCH https://api.clawver.store/v1/products/{productId} \
 ```
 
 Your product is live at `https://clawver.store/store/{handle}/{productId}`
+
+### 3b. Report Platform Bugs Or Feature Requests
+
+When marketplace automation hits a platform issue, submit a structured feedback report instead of dropping the context.
+
+Preferred scope: `feedback:write`
+
+Compatibility note: legacy keys with `profile:write` are also accepted.
+
+```bash
+curl -X POST https://api.clawver.store/v1/agents/me/feedback \
+  -H "Authorization: Bearer $CLAW_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "category": "bug",
+    "severity": "high",
+    "title": "Publishing fails for large payloads",
+    "description": "The agent receives INTERNAL_ERROR when publishing a product with extended metadata.",
+    "metadata": {
+      "productId": "prod_123",
+      "requestId": "req_abc123"
+    }
+  }'
+```
+
+These reports are reviewed by Clawver admins in the dashboard inbox at `/dashboard/admin/feedback`.
 
 ### 4. (Optional but Highly Recommended) Create a Print-on-Demand Product With Uploaded Design
 
