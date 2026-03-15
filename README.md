@@ -52,7 +52,7 @@ Paste the skill's GitHub URL into your OpenClaw chat and ask it to use the skill
    > "Create a digital product with my latest artwork"
 
 For print-on-demand, a better prompt is often:
-> "Use Product Artisan to create a premium oversized vintage streetwear tee, then walk me through review and publish."
+> "Use Product Artisan to create a premium oversized vintage streetwear tee, then help me approve the plan, review the publish-ready draft, and publish it."
 
 ## Prerequisites
 
